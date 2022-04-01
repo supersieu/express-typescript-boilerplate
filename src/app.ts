@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 
 // Routers
 import indexRouter from "@/routes/Index";
+import userRouter from "./routes/userRouter";
 const app = express();
 
 // view engine setup
@@ -17,7 +18,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-
+app.use("/user", userRouter);
 // catch 404
 app.use(function (req: Request, res: Response, next: NextFunction) {
   // handle it how it pleases you
@@ -32,7 +33,6 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
 });
 
 export default app;

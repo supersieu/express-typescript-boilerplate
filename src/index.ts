@@ -6,6 +6,7 @@
 import app from "./app";
 import d from "debug";
 import http from "http";
+import { connectDb } from "./models";
 const debug = d("express-typescript-boilerplate:server");
 
 /**
@@ -22,7 +23,11 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port);
+ connectDb().then(async () => {
+  server.listen(port, () =>
+    console.log(`Example app listening on port ${port}!`),
+  );
+});
 server.on("error", onError);
 server.on("listening", onListening);
 
