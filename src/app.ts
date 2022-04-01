@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 // Routers
 import indexRouter from "@/routes/Index";
 import userRouter from "./routes/userRouter";
+const {ApiResponse} = require('./modules/Response');
 const app = express();
 
 // view engine setup
@@ -28,11 +29,13 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
 // error handler
 app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
   // set locals, only providing error in development
+  
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
   // render the error page
   res.status(err.status || 500);
+  res.send(new ApiResponse(res.statusCode,[],err));
 });
 
 export default app;
