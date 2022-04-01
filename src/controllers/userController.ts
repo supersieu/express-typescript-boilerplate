@@ -11,7 +11,7 @@ export default {
               next(err)
             }
             else{
-              res.status(200).send(new ApiResponse( "test", users));
+              res.status(200).send(new ApiResponse( res.statusCode.toString(), users));
             }  
           });
       return;
@@ -26,7 +26,7 @@ export default {
             next(err)
           }
           else{
-            res.status(200).send(new ApiResponse( "test", user));
+            res.status(200).send(new ApiResponse( res.statusCode.toString(), user));
           }
           });
       return;
@@ -43,7 +43,7 @@ export default {
             next(err)
           }
           else{
-            res.status(200).send(new ApiResponse( "test", user));
+            res.status(200).send(new ApiResponse( res.statusCode.toString(), user));
           }
          });
         
@@ -53,7 +53,7 @@ export default {
   },
   patch: async (req: Request, res: Response, next: NextFunction) => {
     try {
-        models.User.findByIdAndUpdate(req.params.id, req.body,function(err: any, user: any){
+        models.User.findByIdAndUpdate(req.params.id, req.body,{new: true},function(err: any, user: any){
           if(err){
             next(err)
           }
