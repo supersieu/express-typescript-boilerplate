@@ -8,6 +8,7 @@ const sensorSchema = new mongoose.Schema(
         },
         designation: String,
         rawValue: Number,
+        value:Number,
     }
 );
 

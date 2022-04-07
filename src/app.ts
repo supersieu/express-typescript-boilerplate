@@ -7,7 +7,8 @@ import cookieParser from "cookie-parser";
 // Routers
 import userRouter from "./routes/userRouter";
 import actuatorRouter from "./routes/actuatorRouter";
-const { ApiResponse } = require("./modules/Response");
+import sensorRouter from "./routes/sensorRouter";
+const {ApiResponse} = require('./modules/Response');
 const app = express();
 var jwt = require("express-jwt");
 
@@ -28,8 +29,9 @@ app.use(
 app.use(
   "/sensor",
   jwt({ secret: process.env.SECRET_KEY, algorithms: ["HS256"] }),
-  actuatorRouter
+  sensorRouter
 );
+
 // catch 404
 app.use(function (req: Request, res: Response, next: NextFunction) {
   // handle it how it pleases you
