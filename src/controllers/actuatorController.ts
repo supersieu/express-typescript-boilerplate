@@ -14,7 +14,8 @@ export default {
   get_by_id: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const actuator = await models.Actuator.findById({_id: req.params.id});
-      res.status(200).send(new ApiResponse( res.statusCode.toString(), actuator));
+      if (actuator)
+        res.status(200).send(new ApiResponse( res.statusCode.toString(), actuator));
     } catch (error) {
       next(error);
     }
