@@ -25,7 +25,13 @@ function convert(rawValue: number, type: String){
 export default {
   get: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const sensors = await models.Sensor.find({type:req.query.type});
+
+      let sensors=[];
+      if(req.query.type){
+        sensors = await models.Sensor.find({type:req.query.type});
+      }else{ sensors = await models.Sensor.find({});}
+
+      
       for (const element of sensors) {
         element.value=convert(element.rawValue,element.type);
       }

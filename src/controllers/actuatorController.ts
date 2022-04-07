@@ -5,7 +5,10 @@ import { ApiResponse } from "../modules/Response";
 export default {
   get: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const actuators = await models.Actuator.find({type:req.query.type});
+      let actuators=[];
+      if(req.query.type){
+        actuators = await models.Actuator.find({type:req.query.type});
+      }else{ actuators = await models.Actuator.find({});}
       res.status(200).send(new ApiResponse( res.statusCode.toString(), actuators));
     } catch (error) {
       next(error);
