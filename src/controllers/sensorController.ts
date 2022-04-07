@@ -25,7 +25,7 @@ function convert(rawValue: number, type: String){
 export default {
   get: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const sensors = await models.Sensor.find({});
+      const sensors = await models.Sensor.find({type:req.query.type});
       res.status(200).send(new ApiResponse( res.statusCode.toString(), sensors));
     } catch (error) {
       next(error);
@@ -42,9 +42,9 @@ export default {
   },
   post: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const acutator = new models.Sensor(req.body);
-      await acutator.save();
-      res.status(200).send(new ApiResponse( res.statusCode.toString(), acutator));
+      const sensor = new models.Sensor(req.body);
+      await sensor.save();
+      res.status(200).send(new ApiResponse( res.statusCode.toString(), sensor));
     } catch (error) {
       next(error);
     }
