@@ -1,14 +1,21 @@
 import userController from "@/controllers/userController";
 import express from "express";
+import jwt from "express-jwt";
+import { load } from "ts-dotenv";
+const env = load({
+  DATABASE_URL: String,
+  SECRET_KEY: String,
+});
 const router = express.Router();
-var jwt = require("express-jwt");
 
-/* GET home page. */
-router.get("/", userController.get);
-router.get("/:id", userController.get_by_id);
 router.post("/", userController.post);
 router.post("/login", userController.login);
-router.patch("/:id",jwt({ secret: process.env.SECRET_KEY, algorithms: ["HS256"] }), userController.patch);
-router.delete("/:id",jwt({ secret: process.env.SECRET_KEY, algorithms: ["HS256"] }), userController.delete);
+
+router.use(jwt({ secret: env.SECRET_KEY, algorithms: ["HS256"] }));
+
+router.get("/", userController.get);
+router.get("/:id", userController.get_by_id);
+router.patch("/:id", userController.patch);
+router.delete("/:id", userController.delete);
 
 export default router;
