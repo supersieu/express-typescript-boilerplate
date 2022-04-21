@@ -1,11 +1,15 @@
 # Express-TypeScript-Boilerplate
 
 
-config
-environement
-install
-usage
-Installation : 
+## Configuration
+
+### Env file
+```ts
+DATABASE_URL=DATABASE_URL
+SECRET_KEY=SECRET_KEY
+```
+
+## Installation 
 
 ```ts
 npm install
