@@ -5,7 +5,7 @@ import {
   ActuatorPostSchema,
   ActuatorUpdateSchema,
 } from "../types/actuatorSchema";
-
+var xss = require("xss");
 export default {
   get: async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -53,6 +53,7 @@ export default {
   },
   patch: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      
       const ActuatorUpdate = ActuatorUpdateSchema.parse(req.body);
       const actuator = await models.Actuator.findByIdAndUpdate(
         req.params.id,

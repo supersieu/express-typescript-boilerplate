@@ -9,6 +9,7 @@ import {
   UserUpdateSchema,
 } from "../types/userSchema";
 import { load } from "ts-dotenv";
+import { clear } from "console";
 const env = load({
   DATABASE_URL: String,
   SECRET_KEY: String,
@@ -53,6 +54,9 @@ export default {
   },
   patch: async (req: Request, res: Response, next: NextFunction) => {
     try {
+
+      
+      
       const userUpdate = UserUpdateSchema.parse(req.body);
       const user = await models.User.findByIdAndUpdate(
         req.params.id,
