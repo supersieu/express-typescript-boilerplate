@@ -72,7 +72,10 @@ export default {
   },
   patch: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.body.rawValue = req.body.rawValue ? 1 : 0;
+      if (typeof req.body.rawValue === "boolean"){
+        req.body.rawValue = req.body.rawValue ? 1 : 0;
+      }
+      
       const SensorUpdate = SensorUpdateSchema.parse(req.body);
       const sensor = await models.Sensor.findByIdAndUpdate(
         req.params.id,
