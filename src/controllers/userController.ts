@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import models from "../models";
 import { ApiResponse } from "../modules/Response";
+import { Database } from "../modules/Database";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import {
@@ -10,16 +11,17 @@ import {
 } from "../types/userSchema";
 import { load } from "ts-dotenv";
 import { clear } from "console";
+import { emit } from "process";
 const env = load({
   DATABASE_URL: String,
   SECRET_KEY: String,
 });
-
+let database=new Database;
 export default {
   get: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await models.User.find({});
-      res.status(200).json(new ApiResponse(res.statusCode.toString(), users));
+      const data=await database.get("user",req);
+      res.status(200).json(new ApiResponse(res.statusCode.toString(),data));
       return;
     } catch (error) {
       next(error);
