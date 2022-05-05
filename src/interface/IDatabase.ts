@@ -7,5 +7,6 @@ export default interface IDatabase {
     patch:(modelName:string, req: Request)=> Promise<any> | String
     getById:(modelName:string, req: Request)=> Promise<any> | String
     delete:(modelName:string, req: Request)=> Promise<String | undefined>
+    login:(modelName:string, req: Request)=>Promise<{ message: string; token: string; } | undefined>
   }
   
