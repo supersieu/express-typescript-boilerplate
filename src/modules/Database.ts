@@ -11,10 +11,30 @@ import { UserLoginSchema } from "@/types/userSchema";
 import jwt from "jsonwebtoken";
 
 import { load } from "ts-dotenv";
+import Sensor from "@/models/sensor";
+function convert(rawValue: number, type: String) {
+    switch (type) {
+      case "TEMPERATURE":
+        return (75 * rawValue) / 1023 - 20 + " °C";
+      case "HUMIDITY":
+        return (100 * rawValue) / 1023 + " %HR";
+      case "BARO":
+        return (200 * rawValue) / 1023 + 950 + " hPa";
+      case "PROXIMITY":
+        if (rawValue) {
+          return "Actif";
+        } else {
+          return "Inactif";
+        }
+      default:
+        return "Invalide sensor";
+    }
+  }
 const env = load({
     DATABASE_URL: String,
     SECRET_KEY: String,
   });
+
 export class Database extends EventEmitter implements IDatabase{
     constructor(){
         super()
@@ -71,6 +91,15 @@ export class Database extends EventEmitter implements IDatabase{
                       } else {
                         datas = await Model.find({});
                       }
+                      if(Model==Sensor){
+                        let sensors=new Sensor;
+                        sensors=datas;
+                        for (const element of sensors) {
+                            element.value = convert(element.rawValue, element.type);
+                        }
+                        return sensors
+                      }
+                      
               }
               
             return datas;
@@ -79,13 +108,22 @@ export class Database extends EventEmitter implements IDatabase{
         let Model=this.getModel(modelName)
         
         if (!(typeof Model === "string")) {
+            
+            
             const model = await Model.findById({ _id: req.params.id });
+            
                 if (model){
+                    if (Model==Sensor) {
+                        let sensor=new Sensor;
+                        sensor=model;
+                        sensor.value = convert(sensor.rawValue, sensor.type);
+                    }
                     return model;
                 }
                     return "model non trouvé"
                 
         }
+        
         return Model;
     }
     public async post(modelName:string, req: Request){
