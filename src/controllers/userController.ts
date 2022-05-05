@@ -29,10 +29,9 @@ export default {
   },
   get_by_id: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await models.User.findById({ _id: req.params.id });
-      if (user) {
-        res.status(200).json(new ApiResponse(res.statusCode.toString(), user));
-      }
+      const data=await database.getById("user",req);
+      res.status(200).json(new ApiResponse(res.statusCode.toString(), data));
+      
       return;
     } catch (error) {
       next(error);
@@ -40,72 +39,44 @@ export default {
   },
   post: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userPost = UserPostSchema.parse(req.body);
-      userPost.password = await argon2.hash(userPost.password);
-      const user = new models.User(userPost);
-      await user.save();
-      res.status(200).json(
-        new ApiResponse(res.statusCode.toString(), {
-          message: "created",
-          id: user.id,
-        })
-      );
+      const data=await database.post("user",req);
+      res.status(200).json(new ApiResponse(res.statusCode.toString(), data));
+      return;
     } catch (error) {
       next(error);
     }
   },
   patch: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const data=await database.patch("user",req);
+      res.status(200).json(new ApiResponse(res.statusCode.toString(), data));
 
       
       
-      const userUpdate = UserUpdateSchema.parse(req.body);
-      const user = await models.User.findByIdAndUpdate(
-        req.params.id,
-        userUpdate,
-        { new: true }
-      );
-      res.status(200).json(new ApiResponse(res.statusCode.toString(), user));
+      return;
     } catch (error) {
       next(error);
     }
   },
   delete: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await models.User.deleteOne({ _id: req.params.id });
-      res
-        .status(200)
-        .json(
-          new ApiResponse(res.statusCode.toString(), { message: "success" })
-        );
+      const data=await database.delete("user",req);
+      res.status(200).json(new ApiResponse(res.statusCode.toString(), data?.toString));
+
+      
+      
+      return;
     } catch (error) {
       next(error);
     }
   },
   login: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userLogin = UserLoginSchema.parse(req.body);
-      const user = await models.User.findOne({ email: userLogin.email }).select(
-        "+password"
-      );
-      if (user) {
-        if (await argon2.verify(user.password, userLogin.password)) {
-          const token = jwt.sign(
-            { id: user.id, username: user.username },
-            env.SECRET_KEY
-          );
-          const data = { message: "success", token: token };
-          res
-            .status(200)
-            .json(new ApiResponse(res.statusCode.toString(), data));
-        } else {
-          res.status(401);
-          next();
-        }
-      } else {
-        res.status(404);
-        next();
-      }
+
+      const data=await database.login("user",req);
+      res.status(200).json(new ApiResponse(res.statusCode.toString(), data));
+
+      return;      
     } catch (error) {
       next(error);
     }
