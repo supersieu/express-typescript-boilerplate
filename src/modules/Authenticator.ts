@@ -15,31 +15,27 @@ class Authenticator extends EventEmitter implements IAuthenticator {
     super();
   }
 
-  public login(password: string, hash: string, payload: Payload) {
-    this.hasher.verify(hash, password).then((e) => {
-      if (e) {
-        return jwt.sign(payload, env.SECRET_KEY);
-      } else {
-        return null;
-      }
-    });
-    return null;
+  public async login(password: string, hash: string, payload: Payload) {
+    const e = await this.hasher.verify(hash, password);
+    if (e) {
+      return jwt.sign(payload, env.SECRET_KEY);
+    } else {
+      return null;
+    }
   }
 
-  public signup(password: string) {
-    this.hasher.hash(password).then((e) => {
-      return e;
-    });
-    return null;
+  public async signup(password: string) {
+    const e = await this.hasher.hash(password);
+    return e;
   }
 
   public authenticate(token: string, id?: number, role?: string) {
-    jwt.verify(token, env.SECRET_KEY, function (err, decoded) {
-      if (decoded) {
-        return true;
-      }
-    });
-    return false;
+    const decoded = jwt.verify(token.split(" ")[1], env.SECRET_KEY);
+    if (decoded) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 

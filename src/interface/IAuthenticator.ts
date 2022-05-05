@@ -5,7 +5,7 @@ export type Payload = {
     username: string
 }
 export interface IAuthenticator {
-    login: (password: string, hash: string, payload: Payload) => Token | null,
-    signup: (password: string) => Hash | null,
+    login: (password: string, hash: string, payload: Payload) => Promise<Token | null>,
+    signup: (password: string) => Promise<Hash | null>,
     authenticate: (token: Token, id?: number, role?: string) => boolean
 }
