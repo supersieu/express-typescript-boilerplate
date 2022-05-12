@@ -39,4 +39,4 @@ class Authenticator extends EventEmitter implements IAuthenticator {
   }
 }
 
-export default Authenticator;
+export default new Authenticator();

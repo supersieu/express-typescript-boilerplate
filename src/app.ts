@@ -10,8 +10,11 @@ import actuatorRouter from "./routes/actuatorRouter";
 import sensorRouter from "./routes/sensorRouter";
 import { ApiResponse } from "./modules/Response";
 import cors from "cors";
-
 import xss, { escapeHtml } from "xss";
+import emitter from './modules/EventMailer'
+import { Mailer } from './modules/Mailer'
+new Mailer(emitter);
+
 const app = express();
 
 // view engine setup
@@ -25,7 +28,6 @@ app.use(cors());
 app.use(function (req: Request, res: Response, next: NextFunction) {
   try {
     for (const key of Object.keys(req.body)) {
-      console.log(key)
       if (typeof req.body[key] === 'string' || req.body[key] instanceof String) {
         req.body[key] = escapeHtml(req.body[key]);
       }

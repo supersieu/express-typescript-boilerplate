@@ -1,6 +1,6 @@
 import { EventEmitter } from "stream";
 import IDatabase from "../interface/IDatabase";
-import Authenticator from "./Authenticator";
+import auth from "./Authenticator";
 
 import mongoose from "mongoose";
 
@@ -10,6 +10,8 @@ import { UserLoginSchema } from "@/types/userSchema";
 
 import Sensor from "@/models/sensor";
 import User from "@/models/user";
+import emitter from "./EventMailer";
+
 function convert(rawValue: number, type: String) {
   switch (type) {
     case "TEMPERATURE":
@@ -30,7 +32,6 @@ function convert(rawValue: number, type: String) {
 }
 
 export class Database extends EventEmitter implements IDatabase {
-  auth = new Authenticator();
   constructor() {
     super();
   }
@@ -58,7 +59,7 @@ export class Database extends EventEmitter implements IDatabase {
   public async get(model: string, req: Request) {
     const token = req.get("Authorization");
     if (token) {
-      if (this.auth.authenticate(token)) {
+      if (auth.authenticate(token)) {
         let Model = this.getModel(model);
         let datas = Array<mongoose.Model<any, {}, {}, {}>>();
         if (!(typeof Model === "string")) {
@@ -84,7 +85,7 @@ export class Database extends EventEmitter implements IDatabase {
   async getById(modelName: string, req: Request) {
     const token = req.get("Authorization");
     if (token) {
-      if (this.auth.authenticate(token)) {
+      if (auth.authenticate(token)) {
         let Model = this.getModel(modelName);
 
         if (!(typeof Model === "string")) {
@@ -110,9 +111,10 @@ export class Database extends EventEmitter implements IDatabase {
     if (!(typeof Model === "string")) {
       if (Model == User) {
         const body = req.body;
-        body.password = await this.auth.signup(body.password);
+        body.password = await auth.signup(body.password);
         let user = new User(body);
         await user.save();
+        emitter.emit("createUser", user);
         let datas = {
           message: "created",
           id: user.id,
@@ -121,7 +123,7 @@ export class Database extends EventEmitter implements IDatabase {
       } else {
         const token = req.get("Authorization");
         if (token) {
-          if (this.auth.authenticate(token)) {
+          if (auth.authenticate(token)) {
             const model = new Model(req.body);
             await model.save();
             let datas = {
@@ -138,12 +140,16 @@ export class Database extends EventEmitter implements IDatabase {
   public async patch(modelName: string, req: Request) {
     const token = req.get("Authorization");
     if (token) {
-      if (this.auth.authenticate(token)) {
+      if (auth.authenticate(token)) {
         let Model = this.getModel(modelName);
         if (!(typeof Model === "string")) {
           const model = await Model.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
           });
+          if (req.body.type == "PROXIMITY") {
+            emitter.emit("alarm", model);
+          }
+          req.body;
           return model;
         }
       }
@@ -154,7 +160,7 @@ export class Database extends EventEmitter implements IDatabase {
   async delete(modelName: string, req: Request) {
     const token = req.get("Authorization");
     if (token) {
-      if (this.auth.authenticate(token)) {
+      if (auth.authenticate(token)) {
         let Model = this.getModel(modelName);
         if (!(typeof Model === "string")) {
           await Model.deleteOne({ _id: req.params.id });
@@ -171,10 +177,11 @@ export class Database extends EventEmitter implements IDatabase {
       "+password"
     );
     if (user) {
-      const token = await this.auth.login(userLogin.password, user.password, {
+      const token = await auth.login(userLogin.password, user.password, {
         id: user.id,
         username: user.username,
       });
+      emitter.emit("login", user);
       const data = { message: "success", token: token };
       return data;
     }

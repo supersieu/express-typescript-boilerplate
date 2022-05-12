@@ -25,7 +25,9 @@ export default {
   },
   post: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.body.rawValue = req.body.rawValue ? 1 : 0;
+      if (typeof req.body.rawValue === "boolean"){
+        req.body.rawValue = req.body.rawValue ? 1 : 0;
+      }
       const data=await database.post("sensor",req);
       res.status(200).json(new ApiResponse(res.statusCode.toString(), {data}));
       return;
